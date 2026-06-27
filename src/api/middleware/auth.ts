@@ -14,7 +14,11 @@ const KEY_FINGERPRINTS = new Map<string, string>(config.auth.apiKeys.map((k) => 
 
 export const registerAuth = (app: FastifyInstance): void => {
   if (config.auth.apiKeys.length === 0) {
-    app.log.warn({ component: "auth" }, "ROUTER_API_KEYS empty; gateway is unauthenticated");
+    if (config.env === "production") {
+      app.log.warn({ component: "auth" }, "ROUTER_API_KEYS empty in production; gateway is unauthenticated");
+    } else {
+      app.log.info({ component: "auth" }, "auth disabled (no ROUTER_API_KEYS)");
+    }
     return;
   }
 

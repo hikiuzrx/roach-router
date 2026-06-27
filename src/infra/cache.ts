@@ -14,10 +14,13 @@ export const initCache = async (logger: { info: Function; warn: Function; error:
     await redis.connect();
     await redis.set("router:health", "ok");
     client = redis;
-    logger.info({ component: "cache" }, "cache connected");
+    logger.info({ component: "cache", url: config.cache.url }, "cache connected");
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
-    logger.error({ component: "cache", err: message }, "cache init failed; continuing without cache");
+    logger.warn(
+      { component: "cache", url: config.cache.url, err: message },
+      "could not reach cache; continuing without cache (set REDIS_URL='' to silence this)",
+    );
     client = null;
   }
 };
