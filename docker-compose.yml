@@ -1,0 +1,45 @@
+services:
+  valkey:
+    image: valkey/valkey:8-alpine
+    container_name: roach-valkey
+    restart: unless-stopped
+    command: ["valkey-server", "--save", "60", "1", "--loglevel", "notice"]
+    ports:
+      - "6379:6379"
+    volumes:
+      - valkey_data:/data
+    healthcheck:
+      test: ["CMD", "valkey-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  router:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: roach-router
+    restart: unless-stopped
+    depends_on:
+      valkey:
+        condition: service_healthy
+    environment:
+      HOST: 0.0.0.0
+      PORT: 3000
+      NODE_ENV: production
+      LOG_LEVEL: info
+      REDIS_URL: redis://valkey:6379
+      QWEN_API: ${QWEN_API}
+      QWEN_BASE_URL: ${QWEN_BASE_URL:-https://dashscope-intl.aliyuncs.com/compatible-mode/v1}
+      QWEN_DEFAULT_MODEL: ${QWEN_DEFAULT_MODEL:-qwen-plus}
+      KIMI_API: ${KIMI_API}
+      KIMI_BASE_URL: ${KIMI_BASE_URL:-https://api.moonshot.ai/v1}
+      KIMI_DEFAULT_MODEL: ${KIMI_DEFAULT_MODEL:-moonshot-v1-32k}
+      ROUTER_API_KEYS: ${ROUTER_API_KEYS:-}
+      MODELS_CACHE_TTL_SECONDS: ${MODELS_CACHE_TTL_SECONDS:-60}
+      GENERATION_CACHE_TTL_SECONDS: ${GENERATION_CACHE_TTL_SECONDS:-3600}
+    ports:
+      - "3000:3000"
+
+volumes:
+  valkey_data:
