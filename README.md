@@ -5,7 +5,7 @@
 <h1 align="center">roach-router</h1>
 
 <p align="center">
-  OpenAI-compatible LLM gateway that routes between <b>Qwen</b> and <b>Kimi</b>.<br/>
+  OpenAI-compatible  LLM gateway that routes between <b>Qwen</b> and <b>Kimi</b>.<br/>
   Drop-in <code>base_url</code> for the OpenAI SDK, LangChain, CrewAI, Agno.
 </p>
 
